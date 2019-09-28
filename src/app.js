@@ -9,6 +9,6 @@ const resolvers = { Query, Mutation };
 const server = new ApolloServer({ typeDefs, resolvers });
 
 // The `listen` method launches a web server.
-server.listen().then(({ url }) => {
+server.listen('35050').then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });

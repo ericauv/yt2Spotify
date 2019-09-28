@@ -7,8 +7,12 @@
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
     "apollo-server": "^2.9.4",
+<<<<<<< HEAD
     "babel-jest": "^24.9.0",
     "babel-polyfill": "^6.26.0",
+=======
+    "dotenv": "^8.1.0",
+>>>>>>> 98642f2170ef7a386038794b972b342d1043b329
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
