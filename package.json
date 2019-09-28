@@ -4,6 +4,7 @@
   "description": "Convert YouTube playlist to Spotify playlist",
   "main": "app.js",
   "dependencies": {
+    "apollo-server": "^2.9.4",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8"
