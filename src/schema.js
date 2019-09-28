@@ -14,6 +14,7 @@ const schema = gql`
   type Query {
     hello: String
     boo: String
+    getYoutubePlaylistItems(playlistId: String): String
   }
   type Mutation {
     changeHello(cool: String): String

@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config({ path: 'variables.env' });
 const { ApolloServer } = require('apollo-server');
 const typeDefs = require('./schema');
 const Query = require('./resolvers/Query');
