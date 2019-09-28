@@ -2,15 +2,18 @@
   "name": "yt2spotify",
   "version": "1.0.0",
   "description": "Convert YouTube playlist to Spotify playlist",
-  "main": "index.js",
+  "main": "app.js",
   "dependencies": {
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.19.2"
+  },
   "scripts": {
-    "start": "node app.js",
+    "start": "node ./src/app.js",
+    "dev": "nodemon ./src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

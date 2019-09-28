@@ -2,10 +2,11 @@ const { graphql, buildSchema } = require('graphql');
 
 var schema = buildSchema(`
     type Query{
-        hello: String
+        hello: String,
+        boo:String
     }
     type Mutation{
-        changeHello: String
+        changeHello(cool:String): String
     }
 `);
 
