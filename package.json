@@ -1,0 +1,31 @@
+{
+  "name": "yt2spotify",
+  "version": "1.0.0",
+  "description": "Convert YouTube playlist to Spotify playlist",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.9.0",
+    "graphql": "^14.5.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ericauv/yt2Spotify.git"
+  },
+  "keywords": [
+    "youtube",
+    "graphql",
+    "spotify",
+    "playlist"
+  ],
+  "author": "ericauv, koshini",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ericauv/yt2Spotify/issues"
+  },
+  "homepage": "https://github.com/ericauv/yt2Spotify#readme"
+}
