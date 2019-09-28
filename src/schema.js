@@ -3,11 +3,11 @@ const { gql } = require('apollo-server');
 // that together define the "shape" of queries that are executed against
 // your data.
 const schema = gql`
-  type YoutubePlaylist {
+  type YoutubePlaylistList {
     id: ID!
-    items: [YoutubePlaylistItem]!
+    items: [YoutubePlaylist]!
   }
-  type YoutubePlaylistItem {
+  type YoutubePlaylist {
     id: ID!
     title: String #snippet.title
   }
