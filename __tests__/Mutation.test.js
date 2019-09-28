@@ -1,10 +1,9 @@
-import fs from 'fs';
 import { graphql } from 'graphql';
 import { makeExecutableSchema } from 'graphql-tools';
 import Mutation from '../src/resolvers/Mutation';
 import mockYTResponse from '../mocks/mockYTResponse';
 import typeDefs from '../src/schema';
-// import 'babel-polyfill';
+import 'babel-polyfill';
 
 const allMutationTestCase = {
   id: 'All Mutation Test Case',
