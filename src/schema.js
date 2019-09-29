@@ -13,7 +13,7 @@ const schema = gql`
   }
 
   type SpotifyItem {
-    item: Item
+    id: ID!
     track: String
     artist: String
     album: String
@@ -21,7 +21,7 @@ const schema = gql`
     uri: String
   }
   type YoutubeItem {
-    item: Item
+    id: ID!
     title: String
     image: String
     parsedTitle: String

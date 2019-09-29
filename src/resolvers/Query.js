@@ -6,6 +6,7 @@ async function getYoutubePlaylistPage(playlistId, nextPageToken) {
     nextPageToken ? `pageToken=${nextPageToken}&` : null
   }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
   const response = await axios(url, { method: 'GET' });
+
   const { data } = response;
   const page = {
     nextPageToken: data.nextPageToken,
@@ -15,8 +16,9 @@ async function getYoutubePlaylistPage(playlistId, nextPageToken) {
 }
 
 function getYoutubeParsedItems(items) {
-  const youtubeItems = items.map(item => {
+  const youtubeItems = items.map((item, index) => {
     return {
+      id: index,
       title: item.snippet.title,
       parsedTitle: parseSearchTermFromYoutubeTitle(item.snippet.title),
       image: item.snippet.thumbnails.default.url
@@ -64,6 +66,7 @@ function parseSearchTermFromYoutubeTitle(title) {
   return searchTerm;
 }
 
+// [{itemId, title}] => [{itemId, searchTerm}] => [{itemId, uri, track, artist, album}]
 async function searchSpotifyTrack(searchTerm, limit = 10) {
   // assumes most popular search result is desired result
   q = searchTerm.replace(' ', '%20');
