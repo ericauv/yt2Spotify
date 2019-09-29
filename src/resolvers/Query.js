@@ -54,12 +54,50 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
   q = searchTerm.replace(' ', '%20');
 }
 
+function addToSpotifyPlaylist(playlistId, tracks, auth) {
+  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
+  const uris = {
+    "uris" :[]
+  }
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials:  `Bearer ${auth}`,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(uris)
+  });
+  const responseJson = await response.json()
+}
+
+function createPlaylist(name, userId, auth) {
+  const playlistId = '';
+  return playlistId;
+}
+
 const Query = {
 
+  getYoutubeItems: async (parent, args, ctx, info) => {
+    getYoutubePlaylistItems(args.playlistId);
+  },
+  spotifyWidget: (parent, args, ctx, info) => {
+    const playlistId = createPlaylist(
+      args.playlistName,
+      args.userId,
+      args.auth
+    );
+
+    addToSpotifyPlaylist(playlistId, tracks);
+    return `https://open.spotify.com/embed/playlist/${playlistId}`;
+  },
   boo: () => {
     return 'boo';
+  },
+  list: (parent, args, ctx, info) => {
+    const ytList = getYoutubePlaylistItems(args.playlistId);
+    var promise = new Promise()
+    return {youtubeList: ytList, spotifyList: promise.then()};
   }
 };
 
 module.exports = Query;
-[title, title, title];
