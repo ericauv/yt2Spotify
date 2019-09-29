@@ -23,13 +23,13 @@ const schema = gql`
   type YoutubeItem {
     item: Item
     title: String
-    description: String
     image: String
+    parsedTitle: String
   }
   type Query {
     hello: String
     boo: String
-    getYoutubePlaylistItems(playlistId: String): YoutubePlaylist
+    youtubeItems(playlistId: String): List
     list(ytPlaylistId: String!): List
   }
   type Mutation {
