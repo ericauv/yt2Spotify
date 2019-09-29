@@ -7,10 +7,6 @@ const schema = gql`
     id: ID!
     checked: Boolean
   }
-  type List {
-    youtubeList: [YoutubeItem]
-    spotifyList: [SpotifyItem]
-  }
   type SpotifyItem {
     id: ID!
     track: String
@@ -23,14 +19,24 @@ const schema = gql`
     id: ID!
     title: String
     image: String
-    parsedTitle: String
   }
+  type SpotifyPlaylist {
+    name: String!
+    uid: String
+  }
+
+  input YoutubeItemInput {
+    id: ID!
+    title: String
+  }
+
   type Query {
     hello: String
     boo: String
-    youtubeItems(playlistId: String): List
-    list(ytPlaylistId: String!): List
-    spotifyTrack(q: String!): SpotifyItem
+    youtubeItems(playlistId: String): [YoutubeItem]
+    # spotifyTrack(q: String!): SpotifyItem
+    spotifyItems(input: [YoutubeItemInput]): [SpotifyItem]
+    spotifyPlaylist(name: String!, userId: String!): SpotifyPlaylist
   }
   type Mutation {
     changeHello(cool: String): String

@@ -22,7 +22,7 @@ function getYoutubeParsedItems(items) {
       id: index,
       title: item.snippet.title,
       parsedTitle: parseSearchTermFromYoutubeTitle(item.snippet.title),
-      image: item.snippet.thumbnails.default.url
+      // image: item.snippet.thumbnails.default.url,
     };
   });
   return youtubeItems;
@@ -64,7 +64,6 @@ function parseSearchTermFromYoutubeTitle(title) {
   if (foundIndex !== -1) {
     searchTerm = searchTerm.slice(0, foundIndex);
   }
-
   return searchTerm;
 }
 
@@ -76,7 +75,6 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
     config => {
       config.headers.Authorization = `Bearer ${process.env.SPOTIFY_SECRET}`;
       config.headers.Accept = 'application/json';
-      console.log(config);
       return config;
     },
     function(error) {
@@ -85,8 +83,7 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
     }
   );
 
-  // assumes most popular search result is desired result
-  const q = searchTerm.replace(' ', '%20');
+  const q = encodeURIComponent(searchTerm);
   const url = `https://api.spotify.com/v1/search?q=${q}&type=track`;
   const response = await instance.get(url);
   const track = response.data.tracks.items.find(item =>
@@ -94,14 +91,21 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
   );
   const spotifyItem = {
     uri: track.uri.split('spotify:track:')[1],
+    track: track.name,
+    artist: track.artists[0].name,
   };
-
   return spotifyItem;
 }
 
 function getSpotifyItems(youtubeItems) {
-  const promises = youtubeItems.map(item => searchSpotifyTrack(item.title));
-  return promises;
+  const spotifyItems = youtubeItems.map(async item => {
+    const spotifyItem = await searchSpotifyTrack(
+      parseSearchTermFromYoutubeTitle(item.title)
+    );
+    spotifyItem.id = item.id;
+    return spotifyItem;
+  });
+  return spotifyItems;
 }
 
 async function addToSpotifyPlaylist(playlistId, tracks) {
@@ -120,7 +124,6 @@ async function addToSpotifyPlaylist(playlistId, tracks) {
   const responseJson = await response.json();
 }
 
-
 function createPlaylist(name, userId) {
   const playlistId = '';
   return playlistId;
@@ -128,14 +131,17 @@ function createPlaylist(name, userId) {
 
 const Query = {
   youtubeItems: async (parent, args, ctx, info) => {
-   return { youtubeList: getYoutubeItems(args.playlistId) };
+    return getYoutubeItems(args.playlistId);
   },
-  // spotifyItems: async (parent, args, ctx, info) => {
-  //   getSpotifyItems(args.youtubeItems);
+  spotifyItems: async (parent, args, ctx, info) => {
+    return getSpotifyItems(args.input);
+  },
+  spotifyPlaylist: async (parent, args, ctx, info) => {
+    return createPlaylist(args.name, args.uerID);
+  },
+  // spotifyTrack: (parent, args, ctx, info) => {
+  //   return searchSpotifyTrack(args.q);
   // },
-  spotifyTrack: (parent, args, ctx, info) => {
-    return searchSpotifyTrack(args.q);
-  },
 
   // spotifyWidget: (parent, args, ctx, info) => {
   //   const playlistId = createPlaylist(
@@ -143,17 +149,6 @@ const Query = {
   //     args.userId,
   //     args.auth
   //   );
-
-  boo: () => {
-    return 'boo';
-  },
-  list: (parent, args, ctx, info) => {
-    const ytList = getYoutubeItems(args.playlistId);
-    return {
-      youtubeList: getYoutubeItems(args.playlistId),
-      spotifyList: getSpotifyItems(args.youtubeItems),
-    };
-  },
 };
 
 module.exports = Query;
