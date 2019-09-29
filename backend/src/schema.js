@@ -35,7 +35,6 @@ const schema = gql`
   type Query {
     youtubeItems(playlistId: String): [YoutubeItem]
     spotifyTrack(q: String!): SpotifyItem
-    # spotifyTrack(q: String!): SpotifyItem
     spotifyItems(youtubeItems: [YoutubeItemInput]): [SpotifyItem]
     spotifyPlaylist(name: String!, userId: String!): SpotifyPlaylist
   }

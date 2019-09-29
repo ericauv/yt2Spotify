@@ -21,14 +21,15 @@ class SpotifyAPI extends RESTDataSource {
     const track = response.tracks.items.find(item =>
       item.uri.includes('spotify:track:')
     );
-    const spotifyItem = {};
-    spotifyItem.id = id;
-    if (track) {
-      spotifyItem.uri = track.uri.split('spotify:track:')[1];
-      spotifyItem.track = track.name;
-      spotifyItem.artist = track.artists[0].name;
-    }
-    return spotifyItem;
+    return this.itemReducer(track, id);
+  }
+  itemReducer(track, id) {
+    return {
+      id: id || 0,
+      uri: track && track.uri && track.uri.split('spotify:track:')[1],
+      track: track && track.name,
+      artist: track.artists[0].name
+    };
   }
   async getSpotifyItems(youtubeItems) {
     const spotifyItems = youtubeItems.map(async item => {

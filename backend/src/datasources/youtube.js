@@ -18,9 +18,9 @@ class YoutubeAPI extends RESTDataSource {
 
     return page;
   }
-  itemReducer(item, index) {
+  itemReducer(item, id) {
     return {
-      id: index || 0,
+      id: id || 0,
       title: item.snippet && item.snippet.title,
       image:
         item.snippet &&
