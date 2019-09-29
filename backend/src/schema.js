@@ -20,6 +20,10 @@ const schema = gql`
     title: String
     image: String
   }
+  type SpotifyPlaylist {
+    name: String!
+    uid: String
+  }
   input YoutubeItemInput {
     id: ID!
     title: String
@@ -31,6 +35,9 @@ const schema = gql`
   type Query {
     youtubeItems(playlistId: String): [YoutubeItem]
     spotifyTrack(q: String!): SpotifyItem
+    # spotifyTrack(q: String!): SpotifyItem
+    spotifyItems(input: [YoutubeItemInput]): [SpotifyItem]
+    spotifyPlaylist(name: String!, userId: String!): SpotifyPlaylist
   }
   type Mutation {
     changeHello(cool: String): String

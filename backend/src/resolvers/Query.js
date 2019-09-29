@@ -36,12 +36,13 @@ function parseSearchTermFromYoutubeTitle(title) {
 // [{itemId, title}] => [{itemId, searchTerm}] => [{itemId, uri, track, artist, album}]
 
 async function searchSpotifyTrack(searchTerm, limit = 10) {
+  console.log(process.env.SPOTIFY_SECRET);
+
   const instance = axios.create();
   instance.interceptors.request.use(
     config => {
       config.headers.Authorization = `Bearer ${process.env.SPOTIFY_SECRET}`;
       config.headers.Accept = 'application/json';
-      console.log(config);
       return config;
     },
     function(error) {
@@ -49,22 +50,31 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
       return Promise.reject(error);
     }
   );
-  const q = searchTerm.replace(' ', '%20');
+
+  const q = encodeURIComponent(searchTerm);
   const url = `https://api.spotify.com/v1/search?q=${q}&type=track`;
   const response = await instance.get(url);
   const track = response.data.tracks.items.find(item =>
     item.uri.includes('spotify:track:')
   );
   const spotifyItem = {
-    uri: track.uri.split('spotify:track:')[1]
+    uri: track.uri.split('spotify:track:')[1],
+    track: track.name,
+    artist: track.artists[0].name,
   };
-
   return spotifyItem;
 }
 
 function getSpotifyItems(youtubeItems) {
-  const promises = youtubeItems.map(item => searchSpotifyTrack(item.title));
-  return promises;
+  const spotifyItems = youtubeItems.map(async item => {
+    const spotifyItem = await searchSpotifyTrack(
+      parseSearchTermFromYoutubeTitle(item.title)
+    );
+    spotifyItem.id = item.id;
+    console.log(spotifyItem);
+    return spotifyItem;
+  });
+  return spotifyItems;
 }
 
 // async function addToSpotifyPlaylist(playlistId, tracks) {
@@ -92,12 +102,15 @@ const Query = {
   youtubeItems: async (_, { playlistId }, { dataSources }, info) => {
     return dataSources.youtubeAPI.getItems(playlistId);
   },
-  // spotifyItems: async (parent, args, ctx, info) => {
-  //   getSpotifyItems(args.youtubeItems);
-  // },
+  spotifyItems: async (parent, args, ctx, info) => {
+    return getSpotifyItems(args.input);
+  },
   spotifyTrack: (parent, args, ctx, info) => {
     return searchSpotifyTrack(args.q);
-  }
+  },
+  spotifyPlaylist: async (parent, args, ctx, info) => {
+    return createPlaylist(args.name, args.uerID);
+  },
 
   // spotifyWidget: (parent, args, ctx, info) => {
   //   const playlistId = createPlaylist(
