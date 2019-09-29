@@ -33,17 +33,18 @@ async function getYoutubePlaylistPage(playlistId, nextPageToken) {
   return page;
 }
 
-function parseYoutubePlaylistItems(items) {
-  const youtubeItems = items.map(item=> {title:item.snippet.title, description:item.snippet.description, image:item.snippet.thumbnails.default.url})
+function getYoutubeParsedItems(items) {
+  const youtubeItems = items.map(item=> {
+    return ({title:item.snippet.title, description:item.snippet.description, image:item.snippet.thumbnails.default.url})})
   return youtubeItems;
 }
 async function getYoutubeItems(playlistId) {
   let page = {};
   const items = [];
-  do while (page.nextPageToken) {
+  do  {
     page = await getYoutubePlaylistPage(playlistId, page.nextPageToken);
     items.push(...page.items);
-  }
+  }while (page.nextPageToken)
   return getYoutubeParsedItems(items);
 }
 
@@ -77,8 +78,8 @@ function createPlaylist(name, userId, auth) {
 
 const Query = {
 
-  getYoutubeItems: async (parent, args, ctx, info) => {
-    getYoutubePlaylistItems(args.playlistId);
+  youtubeItems: async (parent, args, ctx, info) => {
+    getYoutubeItems(args.playlistId);
   },
   spotifyWidget: (parent, args, ctx, info) => {
     const playlistId = createPlaylist(
