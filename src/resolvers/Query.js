@@ -92,7 +92,11 @@ const Query = {
   boo: () => {
     return 'boo';
   },
+  list: (parent, args, ctx, info)  => {
+    const ytList = getYoutubePlaylistItems(args.playlistId);
+    var promise = new Promise()
+    return {YoutubePlaylist: ytList, SpPlaylist: promise.then()}
+  }
 };
 
 module.exports = Query;
-[title, title, title];
