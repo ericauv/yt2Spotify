@@ -33,21 +33,21 @@ const Query = {
     return dataSources.youtubeAPI.getItems(playlistId);
   },
   spotifyItems: async (
-    parent,
+    _,
     { youtubeItems },
     { dataSources: { spotifyAPI } },
     info
   ) => {
     return spotifyAPI.getSpotifyItems(youtubeItems);
   },
-  spotifyTrack: (parent, { q }, { dataSources: { spotifyAPI } }, info) => {
+  spotifyTrack: (_, { q }, { dataSources: { spotifyAPI } }, info) => {
     return spotifyAPI.searchSpotifyTrack(q);
   },
-  spotifyPlaylist: async (parent, args, ctx, info) => {
+  spotifyPlaylist: async (_, args, ctx, info) => {
     return createPlaylist(args.name, args.uerID);
   }
 
-  // spotifyWidget: (parent, args, ctx, info) => {
+  // spotifyWidget: (_, args, ctx, info) => {
   //   const playlistId = createPlaylist(
   //     args.playlistName,
   //     args.userId,
