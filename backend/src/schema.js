@@ -37,6 +37,7 @@ const schema = gql`
     spotifyTrack(q: String!): SpotifyItem
     spotifyItems(youtubeItems: [YoutubeItemInput]): [SpotifyItem]
     spotifyPlaylist(name: String!, userId: String!): SpotifyPlaylist
+    spotifyAddTracksToPlaylist(playlistId: String!, uris: [String]!): String
   }
   type Mutation {
     changeHello(cool: String): String

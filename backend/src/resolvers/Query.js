@@ -45,6 +45,13 @@ const Query = {
   },
   spotifyPlaylist: async (_, args, ctx, info) => {
     return createPlaylist(args.name, args.uerID);
+  },
+  spotifyAddTracksToPlaylist: async (
+    _,
+    { playlistId, uris },
+    { dataSources: { spotifyAPI } }
+  ) => {
+    return spotifyAPI.addTracksToPlaylist(playlistId, uris);
   }
 
   // spotifyWidget: (_, args, ctx, info) => {

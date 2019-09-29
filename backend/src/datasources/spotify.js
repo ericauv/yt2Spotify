@@ -26,7 +26,7 @@ class SpotifyAPI extends RESTDataSource {
   itemReducer(track, id) {
     return {
       id: id || 0,
-      uri: track && track.uri && track.uri.split('spotify:track:')[1],
+      uri: track && `${track.uri}`,
       track: track && track.name,
       artist: track.artists[0].name
     };
@@ -67,10 +67,32 @@ class SpotifyAPI extends RESTDataSource {
     // find index of start of regex match
     const foundIndex = searchTerm.search(regex);
     if (foundIndex !== -1) {
+      // index was found, remove everything after it
       searchTerm = searchTerm.slice(0, foundIndex);
     }
 
     return searchTerm;
+  }
+
+  async addPageOfTracksToPlaylist(playlistId, position, uris) {
+    const endpoint = `playlists/${playlistId}/tracks`;
+    const params = `?position=${position}`;
+    const body = { uris };
+    this.post(endpoint + params, body);
+  }
+  async addTracksToPlaylist(playlistId, uris) {
+    const endpoint = `playlists/${playlistId}/tracks`;
+    // Spotify api allows only 100 uris per request
+    const pageSize = 100;
+    const j = uris.length;
+    for (let position = 0; position < j; position += pageSize) {
+      this.addPageOfTracksToPlaylist(
+        playlistId,
+        position,
+        uris.slice(position, position + pageSize)
+      );
+    }
+    return `${uris.length} tracks added successfully to playlist with ID: ${playlistId}`;
   }
 }
 module.exports = SpotifyAPI;
