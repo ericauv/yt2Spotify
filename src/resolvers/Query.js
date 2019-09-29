@@ -6,16 +6,10 @@ async function getYoutubePlaylistPage(playlistId, nextPageToken) {
     nextPageToken ? `pageToken=${nextPageToken}&` : null
   }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
   const response = await axios(url, { method: 'GET' });
-<<<<<<< HEAD
   const { data } = response;
   const page = {
     nextPageToken: data.nextPageToken,
     items: data.items
-=======
-  const playlist = {
-    nextPageToken: response.data.nextPageToken,
-    items: response.data.items,
->>>>>>> wip
   };
   return page;
 }
@@ -60,7 +54,21 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
   q = searchTerm.replace(' ', '%20');
 }
 
-function addToSpPlaylist(playlistId, tracks) {}
+function addToSpPlaylist(playlistId, tracks, auth) {
+  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
+  const uris = {
+    "uris" :[]
+  }
+  const response = await fetch(url, {
+    method: 'POST', 
+    credentials:  `Bearer ${auth}`,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(uris) 
+  });
+  const responseJson = await response.json()
+}
 
 function createPlaylist(name, userId, auth) {
   const playlistId = '';
@@ -72,13 +80,12 @@ const Query = {
     getYoutubePlaylistItems(args.playlistId);
   },
   spotifyWidget: (parent, args, ctx, info) => {
-    // return a default widget uri here
     const playlistId = createPlaylist(
       args.playlistName,
       args.userId,
       args.auth
     );
-    const tracks = {};
+
     addToSpPlaylist(playlistId, tracks);
     return `https://open.spotify.com/embed/playlist/${playlistId}`;
   },
