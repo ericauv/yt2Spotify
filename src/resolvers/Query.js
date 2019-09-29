@@ -1,31 +1,13 @@
 const axios = require('axios');
 const source = axios.CancelToken.source();
 require('dotenv').config({ path: 'variables.env' });
-// {
-//   "items": [
-//       {
-//           "id": "UEx4MHNZYkNxT2I4VEJQUmRtQkhzNUlmdHZ2OVRQYm9ZRy4zQkJFRDhFODIxQzU3NDY2",
-//           "snippet": {
-//               "title": "Ariana Grande, Miley Cyrus, Lana Del Rey - Don’t Call Me Angel (Charlie’s Angels)",
-//               "description": "Official music video by Ariana Grande, Miley Cyrus, Lana Del Rey performing “Don’t Call Me Angel (Charlie’s Angels)” – available now: https://charliesangels.lnk.to/dcmaYD\n\n►Follow Charlie’s Angels Online\nAdvanced Tickets: https://www.charliesangels.movie/tickets/?hs308=AG \nWatch Trailer: https://www.youtube.com/watch?v=RSUq4VfWfjE&t=52s\nInstagram: https://www.instagram.com/charliesangels/\nFacebook: https://www.facebook.com/CharliesAngels/\nTwitter: https://twitter.com/CharliesAngels\nWebsite: https://www.charliesangels.movie/?hs308=AG\n\n►Follow Ariana Grande Online\nInstagram: https://www.instagram.com/arianagrande \nFacebook: https://www.facebook.com/arianagrande/ \nTwitter: https://twitter.com/ArianaGrande \nWebsite: https://www.arianagrande.com/ \n\n►Follow Miley Cyrus Online\nInstagram: https://www.instagram.com/mileycyrus\nFacebook: https://www.facebook.com/MileyCyrus\nTwitter: https://twitter.com/MileyCyrus\nWebsite: https://mileycyrus.com/\n\n►Follow Lana Del Rey Online\nInstagram: https://www.instagram.com/lanadelrey/\nFacebook: https://www.facebook.com/lanadelrey\nTwitter: https://twitter.com/lanadelrey \nWebsite: https://lanadelrey.com/\n\nVideo Director: Hannah Lux Davis\nVideo Producer: Brandon Bonfiglio\nfor London Alley\n\n#CharliesAngels #DontCallMeAngel\n\nMusic video by Ariana Grande, Miley Cyrus, Lana Del Rey performing Don’t Call Me Angel (Charlie’s Angels). © 2019 Republic Records, a division of UMG Recordings, Inc. Motion Picture Artwork © CTMG.  All Rights Reserved.",
-//               "thumbnails": {
-//                   "default": {
-//                       "url": "https://i.ytimg.com/vi/leopt__ATR0/default.jpg",
-//                       "width": 120,
-//                       "height": 90
-//                   },
-
-//               },
-//           }
-//       },...
-//     ]
-// }
 
 async function getYoutubePlaylistPage(playlistId, nextPageToken) {
   const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&${
     nextPageToken ? `pageToken=${nextPageToken}&` : null
   }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
   const response = await axios(url, { method: 'GET' });
+
   const { data } = response;
   const page = {
     nextPageToken: data.nextPageToken,
@@ -35,11 +17,12 @@ async function getYoutubePlaylistPage(playlistId, nextPageToken) {
 }
 
 function getYoutubeParsedItems(items) {
-  const youtubeItems = items.map(item => {
+  const youtubeItems = items.map((item, index) => {
     return {
+      id: index,
       title: item.snippet.title,
-      description: item.snippet.description,
-      image: item.snippet.thumbnails.default.url,
+      parsedTitle: parseSearchTermFromYoutubeTitle(item.snippet.title),
+      image: item.snippet.thumbnails.default.url
     };
   });
   return youtubeItems;
@@ -47,13 +30,45 @@ function getYoutubeParsedItems(items) {
 
 async function getYoutubeItems(playlistId) {
   let page = {};
-  const youtubeItems = [];
+  const items = [];
   do {
     page = await getYoutubePlaylistPage(playlistId, page.nextPageToken);
-    youtubeItems.push(...page.items);
+    items.push(...page.items);
   } while (page.nextPageToken);
-  return getYoutubeParsedItems(youtubeItems);
+  return getYoutubeParsedItems(items); // returns [{title,description, image},{...},...]
 }
+
+function parseSearchTermFromYoutubeTitle(title) {
+  // replace 'ft.' with empty string
+  let searchTerm = title.toLowerCase().replace('ft.', '');
+
+  // find start of substring starting with
+  // (OFFICIAL VIDEO...,
+  // (OFFICIAL MUSIC VIDEO...,
+  // [OFFICIAL MUSIC VIDEO...,
+  // [OFFICIAL VIDEO,
+  // (video...,
+  // [Video...,
+  // Official Music Video,
+  // Official Video
+  // [Official...]
+  // (Official...)
+  // (Rate
+  // [Rate
+  // {rate
+  // only use substring before (audio), [audio]
+  const regex = /off?icial (video|music|audio)|music video|[\(\[\{](rate|audio|video|off?ici)/;
+
+  // find index of start of regex match
+  const foundIndex = searchTerm.search(regex);
+  if (foundIndex !== -1) {
+    searchTerm = searchTerm.slice(0, foundIndex);
+  }
+
+  return searchTerm;
+}
+
+// [{itemId, title}] => [{itemId, searchTerm}] => [{itemId, uri, track, artist, album}]
 
 async function searchSpotifyTrack(searchTerm, limit = 10) {
   const instance = axios.create();
@@ -105,6 +120,7 @@ async function addToSpotifyPlaylist(playlistId, tracks) {
   const responseJson = await response.json();
 }
 
+
 function createPlaylist(name, userId) {
   const playlistId = '';
   return playlistId;
@@ -112,7 +128,7 @@ function createPlaylist(name, userId) {
 
 const Query = {
   youtubeItems: async (parent, args, ctx, info) => {
-    getYoutubeItems(args.playlistId);
+   return { youtubeList: getYoutubeItems(args.playlistId) };
   },
   // spotifyItems: async (parent, args, ctx, info) => {
   //   getSpotifyItems(args.youtubeItems);
@@ -120,6 +136,7 @@ const Query = {
   spotifyTrack: (parent, args, ctx, info) => {
     return searchSpotifyTrack(args.q);
   },
+
   // spotifyWidget: (parent, args, ctx, info) => {
   //   const playlistId = createPlaylist(
   //     args.playlistName,
@@ -127,9 +144,6 @@ const Query = {
   //     args.auth
   //   );
 
-  //   addToSpotifyPlaylist(playlistId, tracks);
-  //   return `https://open.spotify.com/embed/playlist/${playlistId}`;
-  // },
   boo: () => {
     return 'boo';
   },
