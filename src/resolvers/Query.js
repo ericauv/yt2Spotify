@@ -1,30 +1,5 @@
 const axios = require('axios');
 require('dotenv').config({ path: 'variables.env' });
-
-async function getYoutubePlaylistPage(playlistId, nextPageToken) {
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&${
-    nextPageToken ? `pageToken=${nextPageToken}&` : null
-  }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
-  const response = await axios(url, { method: 'GET' });
-  const { data } = response;
-  const page = {
-    nextPageToken: data.nextPageToken,
-    items: data.items
-  };
-  return page;
-}
-
-async function getYoutubePlaylist(playlistId) {
-  let page = {};
-  const items = [];
-  do while (page.nextPageToken) {
-    page = getYoutubePlaylistPage(playlistId, page.nextPageToken);
-    items.push(...playlist.items);
-  }
-  return items;
-}
-
-
 // {
 //   "items": [
 //       {
@@ -44,10 +19,35 @@ async function getYoutubePlaylist(playlistId) {
 //       },...
 //     ]
 // }
-function getParsedYoutubeItems(items) {
+
+async function getYoutubePlaylistPage(playlistId, nextPageToken) {
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&${
+    nextPageToken ? `pageToken=${nextPageToken}&` : null
+  }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
+  const response = await axios(url, { method: 'GET' });
+  const { data } = response;
+  const page = {
+    nextPageToken: data.nextPageToken,
+    items: data.items
+  };
+  return page;
+}
+
+function parseYoutubePlaylistItems(items) {
   const youtubeItems = items.map(item=> {title:item.snippet.title, description:item.snippet.description, image:item.snippet.thumbnails.default.url})
   return youtubeItems;
 }
+async function getYoutubeItems(playlistId) {
+  let page = {};
+  const items = [];
+  do while (page.nextPageToken) {
+    page = await getYoutubePlaylistPage(playlistId, page.nextPageToken);
+    items.push(...page.items);
+  }
+  return getYoutubeParsedItems(items);
+}
+
+
 
 async function searchSpotifyTrack(searchTerm, limit = 10) {
   // assumes most popular search result is desired result
@@ -55,9 +55,7 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
 }
 
 const Query = {
-  getYoutubeItems: async (parent, args, ctx, info) => {
-    getYoutubePlaylistItems(args.playlistId);
-  },
+
   boo: () => {
     return 'boo';
   }
