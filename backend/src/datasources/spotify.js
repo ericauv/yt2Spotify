@@ -9,9 +9,12 @@ class SpotifyAPI extends RESTDataSource {
   willSendRequest(request) {
     request.headers.set(
       'Authorization',
-      `Bearer ${process.env.SPOTIFY_SECRET}`
+      `Bearer ${process.env.SPOTIFY_SECRET}`,
+      'Accept',
+      'application/json',
+      'Content-Type',
+      'application/json'
     );
-    request.headers.set('Accept', 'application/json');
   }
 
   async searchSpotifyTrack(searchTerm, id, limit = 5) {
@@ -28,7 +31,7 @@ class SpotifyAPI extends RESTDataSource {
       id: id || 0,
       uri: track && `${track.uri}`,
       track: track && track.name,
-      artist: track.artists[0].name
+      artist: track.artists[0].name,
     };
   }
   async getSpotifyItems(youtubeItems) {
@@ -41,6 +44,16 @@ class SpotifyAPI extends RESTDataSource {
     });
     return spotifyItems;
   }
+
+  async createPlaylist(playlistName, userId) {
+    const endpoint = `/users/${userId}/playlists`;
+    const body = { name: playlistName, public: true };
+    const response = await this.post(endpoint, JSON.stringify(body));
+    console.log(response.id);
+    const playlistID = response.id;
+    return playlistID;
+  }
+
   parseSearchTermFromYoutubeTitle(title) {
     // replace 'ft.' with empty string
     let searchTerm = title.toLowerCase().replace('ft.', '');

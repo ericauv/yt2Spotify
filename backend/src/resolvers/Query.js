@@ -52,7 +52,12 @@ const Query = {
     { dataSources: { spotifyAPI } }
   ) => {
     return spotifyAPI.addTracksToPlaylist(playlistId, uris);
-  }
+  },
+  spotifyPlaylist: async (_, args, { dataSources: { spotifyAPI } }, info) => {
+    // create a playlist
+    // add tracks to the playlist
+    return spotifyAPI.createPlaylist(args.name, args.userId);
+  },
 
   // spotifyWidget: (_, args, ctx, info) => {
   //   const playlistId = createPlaylist(
