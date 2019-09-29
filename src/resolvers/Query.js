@@ -6,10 +6,16 @@ async function getYoutubePlaylistPage(playlistId, nextPageToken) {
     nextPageToken ? `pageToken=${nextPageToken}&` : null
   }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
   const response = await axios(url, { method: 'GET' });
+<<<<<<< HEAD
   const { data } = response;
   const page = {
     nextPageToken: data.nextPageToken,
     items: data.items
+=======
+  const playlist = {
+    nextPageToken: response.data.nextPageToken,
+    items: response.data.items,
+>>>>>>> wip
   };
   return page;
 }
@@ -54,13 +60,31 @@ async function searchSpotifyTrack(searchTerm, limit = 10) {
   q = searchTerm.replace(' ', '%20');
 }
 
+function addToSpPlaylist(playlistId, tracks) {}
+
+function createPlaylist(name, userId, auth) {
+  const playlistId = '';
+  return playlistId;
+}
+
 const Query = {
   getYoutubeItems: async (parent, args, ctx, info) => {
     getYoutubePlaylistItems(args.playlistId);
   },
+  spotifyWidget: (parent, args, ctx, info) => {
+    // return a default widget uri here
+    const playlistId = createPlaylist(
+      args.playlistName,
+      args.userId,
+      args.auth
+    );
+    const tracks = {};
+    addToSpPlaylist(playlistId, tracks);
+    return `https://open.spotify.com/embed/playlist/${playlistId}`;
+  },
   boo: () => {
     return 'boo';
-  }
+  },
 };
 
 module.exports = Query;
