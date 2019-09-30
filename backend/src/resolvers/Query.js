@@ -30,7 +30,7 @@ const Query = {
     { dataSources: { youtubeAPI } },
     info
   ) => {
-    return dataSources.youtubeAPI.getItems(playlistId);
+    return youtubeAPI.getItems(playlistId);
   },
   spotifyItems: async (
     _,

@@ -7,13 +7,13 @@ class YoutubeAPI extends RESTDataSource {
     this.baseURL = 'https://www.googleapis.com/youtube/v3/playlistItems';
   }
   async getPageOfItems(playlistId, nextPageToken) {
-    const params = `?part=snippet&playlistId=${playlistId}&${
-      nextPageToken ? `pageToken=${nextPageToken}&` : null
+    const params = `?part=snippet&playlistId=${playlistId}${
+      nextPageToken ? `&pageToken=${nextPageToken}` : ''
     }&maxResults=50&key=${process.env.YOUTUBE_SECRET}`;
     const responseData = await this.get(params);
     const page = {
       nextPageToken: responseData.nextPageToken,
-      items: responseData.items
+      items: responseData.items,
     };
 
     return page;
@@ -26,7 +26,7 @@ class YoutubeAPI extends RESTDataSource {
         item.snippet &&
         item.snippet.thumbnails &&
         item.snippet.thumbnails.default &&
-        item.snippet.thumbnails.default.url
+        item.snippet.thumbnails.default.url,
     };
   }
   async getItems(playlistId) {
