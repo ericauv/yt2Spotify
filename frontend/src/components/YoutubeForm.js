@@ -2,17 +2,19 @@ import React from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
-const handleOnSubmit = e => {
-  // query for youtube items\
-  e.preventDefault();
-  console.log('submitted');
-};
-
-const YoutubeForm = () => {
+const YoutubeForm = props => {
+  const { setPlaylistId, setIsListVisible, isListVisible } = props;
+  const handleOnSubmit = e => {
+    e.preventDefault();
+    setIsListVisible(!isListVisible);
+  };
   return (
-    <form onSubmit={handleOnSubmit}>
+    <form onSubmit={e => handleOnSubmit(e)}>
       <label>Youtube Playlist URL</label>
-      <input type="text"></input>
+      <input
+        type="text"
+        onChange={e => setPlaylistId(e.currentTarget.value)}
+      ></input>
       <button type="submit">Start Converting</button>
     </form>
   );
